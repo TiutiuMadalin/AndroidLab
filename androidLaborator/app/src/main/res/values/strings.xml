@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">PC Games</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="game_list_fragment_label">Game List</string>
+    <string name="game_edit_fragment_label">Game Edit</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="game_list_fragment">Game list fragment</string>
+    <string name="game_edit_fragment">Game edit fragment</string>
+</resources>
