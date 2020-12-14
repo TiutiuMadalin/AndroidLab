@@ -1,11 +1,13 @@
 package com.example.laboratorandroid.game.games
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +16,7 @@ import com.example.laboratorandroid.core.TAG
 import com.example.laboratorandroid.game.data.Game
 import com.example.laboratorandroid.game.game.GameEditFragment
 import kotlinx.android.synthetic.main.view_game.view.*
+import java.time.LocalDate
 
 
 class GameListAdapter(
@@ -32,7 +35,7 @@ class GameListAdapter(
         onGameClick = View.OnClickListener { view ->
             val game = view.tag as Game
             fragment.findNavController().navigate(R.id.GameEditFragment, Bundle().apply {
-                putString(GameEditFragment.GAME_ID, game.id)
+                putString(GameEditFragment.GAME_ID, game._id)
             })
         }
     }
@@ -44,10 +47,12 @@ class GameListAdapter(
         return ViewHolder(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.v(TAG, "onBindViewHolder $position")
         val game = games[position]
         holder.itemView.tag = game
+        game.releaseDate=LocalDate.now().toString()
         holder.textView.text = game.toString()
         holder.itemView.setOnClickListener(onGameClick)
     }

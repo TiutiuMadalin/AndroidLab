@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.example.laboratorandroid.R
+import com.example.laboratorandroid.auth.data.AuthRepository
 import com.example.laboratorandroid.core.TAG
 import kotlinx.android.synthetic.main.game_list_fragment.*
 
@@ -33,9 +34,13 @@ class GameListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         Log.v(TAG, "onActivityCreated")
+        if (!AuthRepository.isLoggedIn) {
+            findNavController().navigate(R.id.fragment_login)
+            return;
+        }
         setupGameList()
         fab.setOnClickListener {
-            Log.v(TAG, "add new item")
+            Log.v(TAG, "add new game")
             findNavController().navigate(R.id.GameEditFragment)
         }
     }
@@ -59,7 +64,7 @@ class GameListFragment : Fragment() {
                 Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
             }
         }
-        gamesModel.loadGames()
+        gamesModel.refresh()
     }
 
     override fun onDestroy() {

@@ -1,12 +1,16 @@
 package com.example.laboratorandroid.game.data
 
-import java.time.LocalDate
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "games")
 class Game (
-    val id: String,
-    var title: String,
-    var version: Double?,
-    var date: LocalDate?
+    @PrimaryKey @ColumnInfo(name = "_id") val _id: String,
+    @ColumnInfo(name = "title")var title: String,
+    @ColumnInfo(name = "version")var version: Double?,
+    @ColumnInfo(name = "date")var releaseDate: String?
     ) {
-        override fun toString(): String = "Title:$title Version:${version.toString()} Release Date:${date.toString()}"
+        override fun toString(): String = "Title:$title Version:${version.toString()} Release Date:$releaseDate"
 }

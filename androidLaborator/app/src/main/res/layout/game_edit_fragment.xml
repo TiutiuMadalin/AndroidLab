@@ -13,22 +13,33 @@
         android:indeterminate="true"
         android:visibility="gone" />
 
-    <EditTitle
-        android:id="@+id/game_title"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:text="" />
-    <EditVersion
-        android:id="@+id/game_version"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="" />
+        android:orientation="vertical">
 
-    <EditDate
-        android:id="@+id/game_date"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="" />
+        <EditText
+            android:id="@+id/game_title"
+            android:layout_width="match_parent"
+            android:layout_height="114dp"
+            android:inputType="text"
+            android:text="Title" />
+
+        <EditText
+            android:id="@+id/game_version"
+            android:layout_width="match_parent"
+            android:layout_height="111dp"
+            android:inputType="text"
+            android:text="Version" />
+
+        <EditText
+            android:id="@+id/game_date"
+            android:layout_width="match_parent"
+            android:layout_height="118dp"
+            android:ems="10"
+            android:inputType="date" />
+    </LinearLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

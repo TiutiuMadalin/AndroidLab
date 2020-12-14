@@ -1,26 +1,19 @@
 package com.example.laboratorandroid.game.game
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import kotlinx.android.synthetic.main.game_edit_fragment.*
 import com.example.laboratorandroid.R
 import com.example.laboratorandroid.core.TAG
-import kotlinx.android.synthetic.main.game_edit_fragment.*
-import kotlinx.android.synthetic.main.view_game.view.*
-
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
+import com.example.laboratorandroid.game.data.Game
 
 class GameEditFragment : Fragment() {
     companion object {
@@ -29,6 +22,7 @@ class GameEditFragment : Fragment() {
 
     private lateinit var viewModel: GameEditViewModel
     private var gameId: String? = null
+    private var game: Game? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,32 +43,25 @@ class GameEditFragment : Fragment() {
         return inflater.inflate(R.layout.game_edit_fragment, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.v(TAG, "onViewCreated")
-        //game_title.setText
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         Log.v(TAG, "onActivityCreated")
         setupViewModel()
         fab.setOnClickListener {
-            Log.v(TAG, "save Game")
-            viewModel.saveOrUpdateGame(game_title.text.toString(),game_version.text.toString().toDoubleOrNull(),
-                LocalDate.parse(game_date.text.toString(), DateTimeFormatter.ISO_DATE))
+            Log.v(TAG, "save item")
+            val i = game
+            if (i != null) {
+                i.title = game_title.text.toString()
+                i.releaseDate=game_date.text.toString()
+                i.version=game_version.text.toString().toDouble();
+                viewModel.saveOrUpdateGame(i)
+            }
         }
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupViewModel() {
         viewModel = ViewModelProvider(this).get(GameEditViewModel::class.java)
-        viewModel.game.observe(viewLifecycleOwner) { game ->
-            Log.v(TAG, "update items")
-
-        }
         viewModel.fetching.observe(viewLifecycleOwner) { fetching ->
             Log.v(TAG, "update fetching")
             progress.visibility = if (fetching) View.VISIBLE else View.GONE
@@ -89,15 +76,25 @@ class GameEditFragment : Fragment() {
                 }
             }
         }
-        viewModel.completed.observe(viewLifecycleOwner, Observer { completed ->
+        viewModel.completed.observe(viewLifecycleOwner) { completed ->
             if (completed) {
                 Log.v(TAG, "completed, navigate back")
-                findNavController().navigateUp()
+                findNavController().popBackStack()
             }
-        })
+        }
         val id = gameId
-        if (id != null) {
-            viewModel.loadGame(id)
+        if (id == null) {
+            game = Game("", "",0.0,"")
+        } else {
+            viewModel.getGameById(id).observe(viewLifecycleOwner, {
+                Log.v(TAG, "update items")
+                if (it != null) {
+                    game = it
+                    game_title.setText(it.title)
+                    game_date.setText(it.releaseDate)
+                    game_version.setText(it.version.toString())
+                }
+            })
         }
     }
 }

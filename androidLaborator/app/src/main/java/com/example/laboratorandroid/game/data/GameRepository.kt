@@ -1,46 +1,48 @@
 package com.example.laboratorandroid.game.data
 
-import android.util.Log
+
+import androidx.lifecycle.LiveData
 import com.example.laboratorandroid.game.data.remote.GameApi
-import com.example.laboratorandroid.core.TAG
+import com.example.laboratorandroid.core.Result
+import com.example.laboratorandroid.game.data.local.GameDao
 
-object GameRepository {
-    private var cachedGames: MutableList<Game>? = null;
+class GameRepository(private val gameDao: GameDao) {
 
-    suspend fun loadAll(): List<Game> {
-        Log.i(TAG, "loadAll")
-        if (cachedGames != null) {
-            return cachedGames as List<Game>;
+    val games = gameDao.getAll()
+
+    suspend fun refresh(): Result<Boolean> {
+        try {
+            val games = GameApi.service.find()
+            for (game in games) {
+                gameDao.insert(game)
+            }
+            return Result.Success(true)
+        } catch(e: Exception) {
+            return Result.Error(e)
         }
-        cachedGames = mutableListOf()
-        val games = GameApi.service.find()
-        cachedGames?.addAll(games)
-        return cachedGames as List<Game>
     }
 
-    suspend fun load(gameId: String): Game {
-        Log.i(TAG, "load")
-        val game = cachedGames?.find { it.id == gameId }
-        if (game != null) {
-            return game
-        }
-        return GameApi.service.read(gameId)
+    fun getById(gameId: String): LiveData<Game> {
+        return gameDao.getById(gameId)
     }
 
-    suspend fun save(game: Game): Game {
-        Log.i(TAG, "save")
-        val createdGame = GameApi.service.create(game)
-        cachedGames?.add(createdGame)
-        return createdGame
+    suspend fun save(game: Game): Result<Game> {
+        try {
+            val createdGame = GameApi.service.create(game)
+            gameDao.insert(createdGame)
+            return Result.Success(createdGame)
+        } catch(e: Exception) {
+            return Result.Error(e)
+        }
     }
 
-    suspend fun update(game: Game): Game {
-        Log.i(TAG, "update")
-        val updatedGame = GameApi.service.update(game.id, game)
-        val index = cachedGames?.indexOfFirst { it.id == game.id }
-        if (index != null) {
-            cachedGames?.set(index, updatedGame)
+    suspend fun update(game: Game): Result<Game> {
+        try {
+            val updatedGame = GameApi.service.update(game._id, game)
+            gameDao.update(updatedGame)
+            return Result.Success(updatedGame)
+        } catch(e: Exception) {
+            return Result.Error(e)
         }
-        return updatedGame
     }
 }
